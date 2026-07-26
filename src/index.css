@@ -68,6 +68,9 @@ canvas {
   border-radius: 20px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   transition: border 0.3s ease, background 0.3s ease, transform 0.3s ease;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 .glass-panel:hover {
@@ -87,12 +90,13 @@ canvas {
   border: none;
   border-radius: 30px;
   cursor: pointer; /* Changed from none to pointer */
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
 }
 
 .btn-luxury-primary:hover {
-  transform: scale(1.03) translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.15);
+  transform: scale(1.04) translateY(-3px);
+  box-shadow: 0 12px 30px rgba(255, 255, 255, 0.25), 0 0 10px rgba(255, 255, 255, 0.1);
+  background-color: #ffffff;
 }
 
 .btn-luxury-glass {
@@ -101,21 +105,21 @@ canvas {
   font-weight: 500;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.075);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 30px;
   cursor: pointer; /* Changed from none to pointer */
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-luxury-glass:hover {
-  transform: scale(1.03) translateY(-2px);
-  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.04) translateY(-3px);
+  background: rgba(255, 255, 255, 0.14);
   border-color: #0057FF;
-  box-shadow: 0 0 20px rgba(0, 87, 255, 0.3);
+  box-shadow: 0 0 25px rgba(0, 87, 255, 0.4), 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 /* Custom Cinematic Cursor */
@@ -473,4 +477,212 @@ canvas {
     transform: translateX(-30%) translateY(5%);
     opacity: 0.3;
   }
+}
+
+/* ═══ Premium Luxury UI/UX Enhancements ═══ */
+
+/* Luxury Glassmorphic Panel (Right Specs Card) */
+.luxury-glass-panel {
+  background: linear-gradient(135deg, rgba(10, 14, 22, 0.55) 0%, rgba(6, 8, 12, 0.4) 100%) !important;
+  backdrop-filter: blur(40px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(120%) !important;
+  border: 1px solid rgba(0, 87, 255, 0.25) !important;
+  border-radius: 24px !important;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.65), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 18px rgba(0, 87, 255, 0.15) !important;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative;
+  overflow: hidden;
+  /* Force GPU rendering layer to prevent backdrop-filter vanishing during scroll canvas updates */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.luxury-glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 0% 0%, rgba(0, 87, 255, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-glass-panel:hover {
+  border-color: rgba(0, 87, 255, 0.45) !important;
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.8), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 25px rgba(0, 87, 255, 0.25) !important;
+}
+
+/* Telemetry Dashboard Glass Panel (Bottom Left) */
+.luxury-telemetry-panel {
+  background: linear-gradient(135deg, rgba(8, 10, 15, 0.75) 0%, rgba(4, 5, 8, 0.6) 100%) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-left: 3px solid #0057FF !important;
+  border-radius: 14px !important;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.55), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+  padding: 1rem 1.4rem !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.luxury-telemetry-panel:hover {
+  border-color: rgba(0, 87, 255, 0.25) !important;
+  border-left-color: #3B82F6 !important;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.7), 
+    0 0 15px rgba(0, 87, 255, 0.1) !important;
+}
+
+/* Premium Specs Layout */
+.luxury-spec-value {
+  font-family: var(--font-display);
+  font-size: 1.25rem !important;
+  font-weight: 300 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.02em !important;
+  margin-top: 0.1rem;
+}
+
+.luxury-spec-label {
+  font-family: var(--font-mono);
+  font-size: 0.48rem !important;
+  color: var(--text-muted) !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase;
+}
+
+/* Luxury Mini Explore Button */
+.luxury-spec-explore-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem !important;
+  font-weight: bold !important;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  background: rgba(0, 87, 255, 0.12) !important;
+  border: 1px solid rgba(0, 87, 255, 0.3) !important;
+  padding: 0.5rem 1.2rem !important;
+  border-radius: 100px !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 0 10px rgba(0, 87, 255, 0.05);
+}
+
+.luxury-spec-explore-btn:hover {
+  background: #0057FF !important;
+  color: #ffffff !important;
+  border-color: #0057FF !important;
+  box-shadow: 0 0 20px rgba(0, 87, 255, 0.4) !important;
+  transform: translateX(2px);
+}
+
+.luxury-spec-explore-btn .arrow {
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.luxury-spec-explore-btn:hover .arrow {
+  transform: translateX(3px);
+}
+
+/* Animated Hamburg menu wrapper */
+.animated-hamburg-trigger {
+  width: 24px;
+  height: 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.animated-hamburg-trigger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left center;
+}
+
+.animated-hamburg-trigger:hover span:nth-child(1) {
+  transform: scaleX(0.7);
+  background-color: var(--accent-blue);
+}
+
+.animated-hamburg-trigger:hover span:nth-child(2) {
+  background-color: var(--accent-blue);
+}
+
+.animated-hamburg-trigger:hover span:nth-child(3) {
+  transform: scaleX(0.85);
+  background-color: var(--accent-blue);
+}
+
+/* Luxury Pill Panel (Aerodynamic header badges) */
+.luxury-pill-panel {
+  background: linear-gradient(135deg, rgba(10, 14, 22, 0.55) 0%, rgba(6, 8, 12, 0.4) 100%) !important;
+  backdrop-filter: blur(40px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 100px !important;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.55), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 15px rgba(0, 87, 255, 0.08) !important;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.luxury-pill-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 87, 255, 0.1) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-pill-panel:hover {
+  border-color: rgba(0, 87, 255, 0.3) !important;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.7), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 25px rgba(0, 87, 255, 0.2) !important;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  50% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+.hud-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
 }

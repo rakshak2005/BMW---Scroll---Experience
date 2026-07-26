@@ -110,9 +110,17 @@ export default function App() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = false;
 
-    const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+    const isFirstFrame = img.src && img.src.includes('1stimage.png');
+    const scaleMultiplier = isFirstFrame ? 1.05 : 1.0;
+    const scale = Math.max(canvas.width / img.width, canvas.height / img.height) * scaleMultiplier;
     const x = (canvas.width / 2) - (img.width / 2) * scale;
-    const y = (canvas.height / 2) - (img.height / 2) * scale;
+    
+    // Shift the car downwards only on the first frame, bounded to prevent black bars
+    const baseY = (canvas.height / 2) - (img.height / 2) * scale;
+    const maxShiftY = Math.max(0, ((img.height * scale) - canvas.height) / 2);
+    const targetShift = isFirstFrame ? 38 * dpr : 0;
+    const shiftY = Math.min(targetShift, maxShiftY);
+    const y = baseY + shiftY;
 
     ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
   };
@@ -903,7 +911,7 @@ export default function App() {
                     textShadow: '0 2px 4px rgba(0,0,0,0.5)',
                     textDecoration: 'none',
                     transition: 'color 0.4s ease',
-                    cursor: 'none'
+                    cursor: 'pointer'
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.color = 'var(--accent-blue)';
@@ -921,55 +929,19 @@ export default function App() {
 
             {/* Menu Trigger */}
             <div 
-              style={{ cursor: 'none', fontSize: '1.2rem', color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+              className="animated-hamburg-trigger"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-              ☰
+              <span />
+              <span />
+              <span />
             </div>
           </div>
         </header>
       )}
 
-      {/* TELEMETRY DEBUG HUD (Designed system block with terminal line & blinking cursor) */}
-      {isLoaded && (
-        <div 
-          ref={debugHudRef}
-          className="telemetry-debug-hud"
-          style={{
-            position: 'fixed',
-            bottom: 'var(--header-padding-y)',
-            left: 'var(--hud-side-margin)',
-            zIndex: 100,
-            opacity: 1,
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.65rem',
-            color: 'var(--text-secondary)',
-            letterSpacing: '0.15em',
-            pointerEvents: 'none',
-            background: 'var(--glass-bg)',
-            borderLeft: '2px solid var(--accent-blue)',
-            padding: '0.8rem 1.4rem',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.3rem',
-            border: '1px solid var(--glass-border)',
-            borderLeft: '2px solid var(--accent-blue)'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ color: 'var(--text-muted)', fontWeight: 'bold' }}>HUD_SYNC //</span>
-            <span>RAW_F_<span ref={frameTelemetryRef} style={{ color: 'var(--accent-blue)', fontWeight: 'bold' }}>000</span> / {FRAME_COUNT - 1}</span>
-            <span className="blinking-cursor" style={{ width: '4px', height: '11px', backgroundColor: 'var(--accent-blue)', display: 'inline-block' }} />
-          </div>
-          <div style={{ fontSize: '0.52rem', color: 'var(--text-muted)' }}>
-            SRC_PATH // <span ref={srcTelemetryRef} style={{ color: 'var(--text-secondary)' }}>1stimage.png</span>
-          </div>
-        </div>
-      )}
+
 
       {/* BOTTOM-CENTER HIGH-TECH LINE & DOT SCROLL TIMELINE */}
       {isLoaded && (
@@ -994,7 +966,7 @@ export default function App() {
             height: '24px',
             display: 'flex',
             alignItems: 'center',
-            cursor: 'none'
+            cursor: 'pointer'
           }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -1048,7 +1020,7 @@ export default function App() {
                       border: '1px solid rgba(0,0,0,0.5)',
                       boxShadow: isActive ? '0 0 10px #ffffff, 0 0 15px var(--accent-blue)' : 'none',
                       transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                      cursor: 'none',
+                      cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1105,7 +1077,8 @@ export default function App() {
               margin: 0,
               textTransform: 'uppercase',
               color: 'var(--text-primary)',
-              lineHeight: '0.9'
+              lineHeight: '0.9',
+              textShadow: '0 4px 24px rgba(0, 0, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.9)'
             }}>
               THE<br />
               ULTIMATE
@@ -1118,20 +1091,22 @@ export default function App() {
               margin: 0,
               textTransform: 'uppercase',
               color: 'var(--text-primary)',
-              lineHeight: '0.95'
+              lineHeight: '0.95',
+              textShadow: '0 4px 24px rgba(0, 0, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.9)'
             }}>
               DRIVING<br />
               MACHINE
             </h2>
           </div>
-
+ 
           <p style={{
             fontSize: '0.85rem',
-            color: 'var(--text-secondary)',
+            color: 'rgba(255, 255, 255, 0.9)',
             lineHeight: '1.6',
             margin: 0,
-            fontWeight: '300',
-            maxWidth: '340px'
+            fontWeight: '400',
+            maxWidth: '340px',
+            textShadow: '0 2px 10px rgba(0, 0, 0, 0.95), 0 1px 3px rgba(0, 0, 0, 0.95)'
           }}>
             Experience engineering in motion. Performance crafted with precision and raw emotion.
           </p>
@@ -1179,7 +1154,7 @@ export default function App() {
       {isLoaded && (
         <div 
           ref={floatCardRef}
-          className="glass-panel"
+          className="luxury-glass-panel"
           style={{
             position: 'fixed',
             bottom: 'var(--header-padding-y)',
@@ -1192,43 +1167,46 @@ export default function App() {
             display: 'flex',
             flexDirection: 'column',
             gap: '1.2rem',
-            boxSizing: 'border-box',
-            background: 'var(--glass-bg)',
-            borderColor: 'var(--glass-border)'
+            boxSizing: 'border-box'
           }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           <div>
-            <div style={{ fontSize: '0.5rem', letterSpacing: '0.3em', color: 'var(--text-muted)', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
+            <div className="luxury-spec-label" style={{ marginBottom: '0.3rem' }}>
               CURRENT CONFIG
             </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: '300', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: '300', color: 'var(--text-primary)', letterSpacing: '0.04em' }}>
               BMW M440i Coupe
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.8rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.9rem' }}>
             <div>
-              <div style={{ fontSize: '0.45rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>POWER</div>
-              <div style={{ fontSize: '1rem', fontFamily: 'var(--font-display)', fontWeight: '200', color: 'var(--text-primary)' }}>382 HP</div>
+              <div className="luxury-spec-label">POWER</div>
+              <div className="luxury-spec-value">382 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>HP</span></div>
             </div>
-            <div>
-              <div style={{ fontSize: '0.45rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>0-100 KM/H</div>
-              <div style={{ fontSize: '1rem', fontFamily: 'var(--font-display)', fontWeight: '200', color: 'var(--text-primary)' }}>4.5 Sec</div>
+            <div style={{ textAlign: 'right' }}>
+              <div className="luxury-spec-label">0-100 KM/H</div>
+              <div className="luxury-spec-value">4.5 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Sec</span></div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.8rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.9rem' }}>
             <div>
-              <div style={{ fontSize: '0.45rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>EST. STARTING</div>
-              <div style={{ fontSize: '1rem', fontFamily: 'var(--font-display)', fontWeight: '400', color: 'var(--text-primary)' }}>$61,000</div>
+              <div className="luxury-spec-label">EST. STARTING</div>
+              <div className="luxury-spec-value" style={{ fontWeight: '400' }}>₹72,90,000</div>
             </div>
             <a 
-              href="#" 
-              style={{ fontSize: '0.65rem', color: 'var(--accent-blue)', textDecoration: 'none', letterSpacing: '0.1em', fontWeight: 'bold' }}
+              href="https://www.bmw.in/en/index.html" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="luxury-spec-explore-btn"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
-              Explore →
+              <span>Explore</span>
+              <span className="arrow">→</span>
             </a>
           </div>
         </div>
@@ -1274,23 +1252,18 @@ export default function App() {
       {isLoaded && (
         <div
           ref={sec2TitleRef}
+          className="luxury-pill-panel"
           style={{
             position: 'fixed',
             top: '7.5%',
             left: '50%',
-            transform: 'translateX(-50%)',
+            transform: 'translate3d(-50%, 0, 0)',
             zIndex: 85,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: '0.8rem',
-            background: 'var(--glass-bg)',
-            border: '1px solid var(--glass-border)',
-            backdropFilter: 'blur(25px)',
-            WebkitBackdropFilter: 'blur(25px)',
             padding: '1.2rem 3rem',
-            borderRadius: '100px',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
             opacity: 0,
             pointerEvents: 'none',
             fontFamily: "'Inter', sans-serif",
@@ -1371,12 +1344,12 @@ export default function App() {
       {isLoaded && (
         <div
           ref={sec3TitleRef}
-          className="glass-panel"
+          className="luxury-glass-panel"
           style={{
             position: 'fixed',
             top: '50%',
             right: 'var(--hud-side-margin)',
-            transform: 'translateY(-50%)',
+            transform: 'translate3d(0, -50%, 0)',
             width: 'calc(100% - 2 * var(--hud-side-margin))',
             maxWidth: '340px',
             padding: '1.8rem',
@@ -1387,12 +1360,7 @@ export default function App() {
             opacity: 0,
             pointerEvents: 'none',
             boxSizing: 'border-box',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)',
-            border: '1px solid var(--glass-border)',
-            background: 'var(--glass-bg)',
-            borderRadius: '16px',
-            fontFamily: "'Inter', sans-serif",
-            transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
+            fontFamily: "'Inter', sans-serif"
           }}
         >
           {/* Small circular status dot anchored to the bottom-left corner of the card */}
@@ -1492,18 +1460,12 @@ export default function App() {
         >
           {/* TOP LEFT: LIVE TELEMETRY BADGE */}
           <div 
-            className="sec4-badge-left"
+            className="sec4-badge-left luxury-glass-panel"
             style={{
               position: 'absolute',
               top: '3rem',
               left: 'var(--hud-side-margin)',
-              background: 'rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '20px',
               padding: '1.2rem 1.6rem',
-              boxShadow: '0 30px 80px rgba(0,0,0,0.35)',
               display: 'flex',
               flexDirection: 'column',
               gap: '0.5rem',
@@ -1527,7 +1489,7 @@ export default function App() {
           {/* TOP CENTER: CINEMATIC WORD FADE-IN */}
           <div style={{
             position: 'absolute',
-            top: '3rem',
+            top: '2.5rem',
             left: '50%',
             transform: 'translateX(-50%)',
             textAlign: 'center',
@@ -1535,37 +1497,36 @@ export default function App() {
             flexDirection: 'column',
             alignItems: 'center',
             pointerEvents: 'none',
-            width: '90%'
+            width: '90%',
+            maxWidth: '650px',
+            // Soft radial backdrop vignette to darken busy backgrounds and isolate the title text
+            background: 'radial-gradient(circle at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 70%)',
+            padding: '1.8rem 2.8rem',
+            borderRadius: '40px'
           }}>
             {/* Huge M4 Blurred Backdrop */}
-            <div style={{ position: 'absolute', top: '-1.5rem', fontSize: '6rem', fontWeight: '900', color: '#ffffff', opacity: 0.05, filter: 'blur(5px)', letterSpacing: '0.05em', zIndex: -1, userSelect: 'none' }}>
+            <div style={{ position: 'absolute', top: '0.2rem', fontSize: '6rem', fontWeight: '900', color: '#ffffff', opacity: 0.05, filter: 'blur(5px)', letterSpacing: '0.05em', zIndex: -1, userSelect: 'none' }}>
               M4
             </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: '900', fontSize: '2rem', letterSpacing: '0.2em', color: '#ffffff', margin: 0, textTransform: 'uppercase', lineHeight: '1.1', textShadow: '0 4px 16px rgba(0, 0, 0, 0.9)' }}>
+            <h1 style={{ fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif', fontWeight: '700', fontSize: '3rem', letterSpacing: '0.2em', color: '#ffffff', margin: 0, textTransform: 'uppercase', lineHeight: '1.1', textShadow: '0 4px 20px rgba(0, 0, 0, 0.95), 0 2px 4px rgba(0, 0, 0, 0.95)' }}>
               BMW M4
             </h1>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: '700', fontSize: '1rem', letterSpacing: '0.25em', color: '#ffffff', margin: '0.2rem 0 0.5rem 0', textTransform: 'uppercase', textShadow: '0 4px 16px rgba(0, 0, 0, 0.9)' }}>
+            <h2 style={{ fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif', fontWeight: '700', fontSize: '1.3rem', letterSpacing: '0.25em', color: '#ffffff', margin: '0.3rem 0 0.6rem 0', textTransform: 'uppercase', textShadow: '0 4px 16px rgba(0, 0, 0, 0.95)' }}>
               COMPETITION
             </h2>
-            <div style={{ fontSize: '0.5rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', color: '#B7BCC8', textTransform: 'uppercase', textShadow: '0 2px 8px rgba(0, 0, 0, 0.9)' }}>
+            <div style={{ fontSize: '0.78rem', fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif', letterSpacing: '0.15em', color: 'rgba(255, 255, 255, 0.9)', fontWeight: 'bold', textTransform: 'uppercase', textShadow: '0 2px 10px rgba(0, 0, 0, 1)' }}>
               The Ultimate Driving Machine
             </div>
           </div>
 
           {/* TOP RIGHT: NUMERICAL TELEMETRY BOARD */}
           <div 
-            className="sec4-telemetry-right"
+            className="sec4-telemetry-right luxury-glass-panel"
             style={{
               position: 'absolute',
               top: '3rem',
               right: 'var(--hud-side-margin)',
-              background: 'rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(30px)',
-              WebkitBackdropFilter: 'blur(30px)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '20px',
               padding: '1.4rem 1.8rem',
-              boxShadow: '0 30px 80px rgba(0,0,0,0.35)',
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
               gap: '1rem',
@@ -1601,18 +1562,12 @@ export default function App() {
 
           {/* BOTTOM LEFT: ONBOARD DIAGNOSTICS */}
           <div 
-            className="sec4-diagnostics-left"
+            className="sec4-diagnostics-left luxury-glass-panel"
             style={{
               position: 'absolute',
-              bottom: '8.5rem',
+              bottom: '3rem',
               left: 'var(--hud-side-margin)',
-              background: 'rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(30px)',
-              WebkitBackdropFilter: 'blur(30px)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '20px',
               padding: '1.4rem 1.6rem',
-              boxShadow: '0 30px 80px rgba(0,0,0,0.35)',
               display: 'flex',
               flexDirection: 'column',
               gap: '0.4rem',
@@ -1691,22 +1646,22 @@ export default function App() {
               <button
                 key={btn.label}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-6px)';
+                  e.currentTarget.style.transform = 'translateY(-3px)';
                   e.currentTarget.style.borderColor = '#006CFF';
-                  e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 108, 255, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 87, 255, 0.4), 0 10px 30px rgba(0,0,0,0.3)';
                   handleMouseEnter();
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+                  e.currentTarget.style.borderColor = 'rgba(0, 87, 255, 0.25)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 87, 255, 0.08), 0 10px 30px rgba(0,0,0,0.2)';
                   handleMouseLeave();
                 }}
                 style={{
-                  background: 'rgba(255,255,255,0.06)',
+                  background: 'rgba(255,255,255,0.075)',
                   backdropFilter: 'blur(30px)',
                   WebkitBackdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  border: '1px solid rgba(0, 87, 255, 0.25)',
                   borderRadius: '12px',
                   padding: '0.8rem 1.6rem',
                   color: '#ffffff',
@@ -1714,12 +1669,12 @@ export default function App() {
                   fontSize: '0.6rem',
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
-                  cursor: 'none',
+                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '1.5rem',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                  boxShadow: '0 0 15px rgba(0, 87, 255, 0.08), 0 10px 30px rgba(0,0,0,0.2)',
                   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                   minWidth: '160px'
                 }}
@@ -1752,7 +1707,7 @@ export default function App() {
           {/* TOP CENTER: CINEMATIC HEADING */}
           <div style={{
             position: 'absolute',
-            top: '3.5rem',
+            top: '3.2rem',
             left: '50%',
             transform: 'translateX(-50%)',
             textAlign: 'center',
@@ -1760,17 +1715,79 @@ export default function App() {
             flexDirection: 'column',
             alignItems: 'center',
             pointerEvents: 'none',
-            width: '90%'
+            width: '90%',
+            maxWidth: '650px',
+            // Soft radial shadow mask to darken complex bridge details and make text stand out sharply
+            background: 'radial-gradient(circle at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 70%)',
+            padding: '2rem 3rem',
+            borderRadius: '50px'
           }}>
             {/* Huge Motion Backdrop */}
-            <div style={{ position: 'absolute', top: '-1.5rem', fontSize: '6rem', fontWeight: '900', color: '#ffffff', opacity: 0.04, filter: 'blur(4px)', letterSpacing: '0.08em', zIndex: -1, userSelect: 'none' }}>
+            <div style={{ position: 'absolute', top: '0.5rem', fontSize: '6rem', fontWeight: '900', color: '#ffffff', opacity: 0.04, filter: 'blur(4px)', letterSpacing: '0.08em', zIndex: -1, userSelect: 'none' }}>
               MOTION
             </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: '900', fontSize: '2rem', letterSpacing: '0.25em', color: '#ffffff', margin: 0, textTransform: 'uppercase', lineHeight: '1.2', textShadow: '0 4px 16px rgba(0, 0, 0, 0.9)' }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: '900', fontSize: '2.4rem', letterSpacing: '0.25em', color: '#ffffff', margin: 0, textTransform: 'uppercase', lineHeight: '1.2', textShadow: '0 4px 20px rgba(0, 0, 0, 0.95), 0 2px 4px rgba(0, 0, 0, 0.95)' }}>
               ENGINEERED<br />FOR EVERY ROAD
             </h1>
-            <div style={{ fontSize: '0.55rem', fontFamily: 'var(--font-display)', letterSpacing: '0.1em', color: '#B7BCC8', textTransform: 'uppercase', marginTop: '0.6rem', maxWidth: '420px', lineHeight: '1.5', textShadow: '0 2px 8px rgba(0, 0, 0, 0.9)' }}>
+            <div style={{ 
+              fontSize: '0.85rem', 
+              fontFamily: 'var(--font-display)', 
+              letterSpacing: '0.15em', 
+              color: '#ffffff', 
+              textTransform: 'uppercase', 
+              marginTop: '0.9rem', 
+              maxWidth: '520px', 
+              lineHeight: '1.6', 
+              fontWeight: '500', 
+              textShadow: '0 2px 14px rgba(0, 0, 0, 1), 0 4px 30px rgba(0, 0, 0, 1), 0 1px 2px rgba(0, 0, 0, 1)' 
+            }}>
               Precision engineered to deliver unmatched performance in every condition.
+            </div>
+          </div>
+
+          {/* TOP LEFT: ACTIVE CHASSIS TELEMETRY */}
+          <div 
+            className="luxury-glass-panel"
+            style={{
+              position: 'absolute',
+              top: '3.5rem',
+              left: 'var(--hud-side-margin)',
+              padding: '1.4rem 1.6rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.8rem',
+              minWidth: '200px',
+              boxSizing: 'border-box',
+              pointerEvents: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span className="pulsing-dot-blue" style={{ width: '6px', height: '6px', backgroundColor: '#006CFF', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 10px #006CFF' }} />
+              <span style={{ fontSize: '0.55rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', color: '#006CFF', fontWeight: 'bold' }}>
+                ACTIVE HANDLING // SEC_05
+              </span>
+            </div>
+            
+            <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.06)' }} />
+            
+            {/* Dynamic Suspension stroke indicator bars */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {[
+                { wheel: 'FL DAMPING', value: 68 },
+                { wheel: 'FR DAMPING', value: 55 },
+                { wheel: 'RL DAMPING', value: 42 },
+                { wheel: 'RR DAMPING', value: 38 }
+              ].map((w) => (
+                <div key={w.wheel} style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.45rem', fontFamily: 'var(--font-mono)', color: '#B7BCC8' }}>
+                    <span>{w.wheel}</span>
+                    <span style={{ color: '#ffffff' }}>{w.value}%</span>
+                  </div>
+                  <div style={{ width: '100%', height: '3px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: `${w.value}%`, height: '100%', backgroundColor: '#006CFF', boxShadow: '0 0 8px #006CFF', borderRadius: '2px' }} />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -1779,7 +1796,7 @@ export default function App() {
             className="sec5-telemetry-right"
             style={{
               position: 'absolute',
-              top: '3rem',
+              top: '3.5rem',
               right: 'var(--hud-side-margin)',
               display: 'flex',
               flexDirection: 'column',
@@ -1794,22 +1811,19 @@ export default function App() {
             ].map((pill) => (
               <div 
                 key={pill.label}
+                className="luxury-pill-panel"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '100px',
-                  padding: '0.6rem 1.4rem',
+                  padding: '0.7rem 1.6rem',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  gap: '2.5rem',
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
+                  gap: '3rem',
+                  minWidth: '220px',
+                  boxSizing: 'border-box'
                 }}
               >
-                <span style={{ fontSize: '0.5rem', fontFamily: 'var(--font-mono)', color: '#B7BCC8', letterSpacing: '0.1em' }}>{pill.label}</span>
-                <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-display)', color: '#ffffff', fontWeight: 'bold' }}>{pill.val}</span>
+                <span style={{ fontSize: '0.52rem', fontFamily: 'var(--font-mono)', color: '#B7BCC8', letterSpacing: '0.15em', fontWeight: 'bold' }}>{pill.label}</span>
+                <span style={{ fontSize: '0.9rem', fontFamily: 'var(--font-display)', color: '#ffffff', fontWeight: '300', letterSpacing: '0.04em', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>{pill.val}</span>
               </div>
             ))}
           </div>
@@ -1836,9 +1850,9 @@ export default function App() {
           {/* CENTER: Big cinematic floating text — no background card */}
           <div style={{
             position: 'absolute',
-            top: '50%',
+            top: '28%',
             left: '50%',
-            transform: 'translate(-50%, -55%)',
+            transform: 'translate3d(-50%, -50%, 0)',
             textAlign: 'center',
             display: 'flex',
             flexDirection: 'column',
@@ -1889,97 +1903,61 @@ export default function App() {
             {/* Subtitle */}
             <p style={{
               fontSize: '0.85rem',
-              color: 'rgba(255, 255, 255, 0.7)',
+              color: 'rgba(255, 255, 255, 0.95)',
               lineHeight: '1.6',
               margin: 0,
               maxWidth: '440px',
-              fontWeight: '300',
-              textShadow: '0 2px 12px rgba(0, 0, 0, 0.9)'
+              fontWeight: '400',
+              textShadow: '0 2px 14px rgba(0, 0, 0, 0.95), 0 1px 3px rgba(0, 0, 0, 0.95)'
             }}>
               Feel the raw power of 620 HP TwinPower Turbo inline-six and M xDrive on the open road.
             </p>
 
+
+
             {/* CTA pill button */}
-            <button
+            <a
+              href="https://www.bmw-kunexclusive-bengaluru.in/test-drive"
+              target="_blank"
+              rel="noopener noreferrer"
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px) scale(1.04)';
-                e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 108, 255, 0.5), 0 15px 40px rgba(0, 0, 0, 0.4)';
+                e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 108, 255, 0.6), 0 15px 40px rgba(0, 0, 0, 0.4)';
                 handleMouseEnter();
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 108, 255, 0.3), 0 10px 30px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 108, 255, 0.35), 0 10px 30px rgba(0, 0, 0, 0.3)';
                 handleMouseLeave();
               }}
               style={{
                 marginTop: '0.6rem',
-                padding: '1rem 3rem',
+                padding: '0.65rem 1.8rem',
                 background: 'linear-gradient(135deg, #006CFF, #0050CC)',
                 border: 'none',
                 borderRadius: '100px',
                 color: '#ffffff',
-                fontSize: '0.75rem',
+                fontSize: '0.62rem',
                 fontFamily: 'var(--font-mono)',
                 fontWeight: 'bold',
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                cursor: 'none',
+                cursor: 'pointer',
                 transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: '0 0 25px rgba(0, 108, 255, 0.3), 0 10px 30px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0 0 25px rgba(0, 108, 255, 0.35), 0 10px 30px rgba(0, 0, 0, 0.3)',
                 pointerEvents: 'auto',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.8rem'
+                gap: '0.5rem',
+                textDecoration: 'none'
               }}
             >
               <span>RESERVE YOUR DRIVE</span>
-              <span style={{ fontSize: '1rem' }}>→</span>
-            </button>
+              <span style={{ fontSize: '0.8rem' }}>→</span>
+            </a>
           </div>
 
-          {/* Bottom stats bar — compact floating row */}
-          <div style={{
-            position: 'absolute',
-            bottom: '5rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2.5rem'
-          }}>
-            {[
-              { val: '620', unit: 'HP' },
-              { val: '3.2', unit: '0-100' },
-              { val: '290', unit: 'KM/H' }
-            ].map((stat, i) => (
-              <React.Fragment key={stat.unit}>
-                {i > 0 && (
-                  <div style={{ width: '1px', height: '28px', backgroundColor: 'rgba(255,255,255,0.15)' }} />
-                )}
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ 
-                    fontSize: '1.4rem', 
-                    fontFamily: 'var(--font-display)', 
-                    fontWeight: '300', 
-                    color: '#ffffff',
-                    textShadow: '0 2px 12px rgba(0,0,0,0.8)'
-                  }}>
-                    {stat.val}
-                  </div>
-                  <div style={{ 
-                    fontSize: '0.45rem', 
-                    fontFamily: 'var(--font-mono)', 
-                    letterSpacing: '0.15em', 
-                    color: 'rgba(255,255,255,0.45)', 
-                    marginTop: '0.2rem',
-                    textShadow: '0 2px 8px rgba(0,0,0,0.8)'
-                  }}>
-                    {stat.unit}
-                  </div>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
+
         </div>
       )}
 
@@ -1999,35 +1977,67 @@ export default function App() {
             transition: 'opacity 0.6s ease'
           }}
         >
-          {/* ═══ Subtle ambient glow behind the logo — no borders, just soft light ═══ */}
+          {/* Pulsing center background glow behind BMW logo */}
           <div style={{
             position: 'absolute',
-            top: '35%',
+            top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '500px',
-            height: '500px',
-            background: 'radial-gradient(circle, rgba(0, 108, 255, 0.06) 0%, transparent 60%)',
+            width: '520px',
+            height: '520px',
+            background: 'radial-gradient(circle, rgba(0, 108, 255, 0.18) 0%, rgba(0, 87, 255, 0.06) 50%, transparent 70%)',
             pointerEvents: 'none',
-            filter: 'blur(40px)',
+            filter: 'blur(30px)',
             animation: 'logoPulseGlow 5s ease-in-out infinite alternate'
           }} />
 
-          {/* ═══ CORNER BRACKETS — cinematic framing ═══ */}
+          {/* ═══ CORNER BRACKETS & HUD PANEL WIDGETS — cinematic wow framing ═══ */}
           {/* Top-left */}
           <div style={{
             position: 'absolute', top: '2.5rem', left: '2.5rem',
-            width: '35px', height: '35px',
-            borderTop: '1px solid rgba(255,255,255,0.12)',
-            borderLeft: '1px solid rgba(255,255,255,0.12)'
-          }} />
+            paddingLeft: '1rem', paddingTop: '1rem',
+            borderTop: '1px solid rgba(255,255,255,0.2)',
+            borderLeft: '1px solid rgba(255,255,255,0.2)',
+            display: 'flex', flexDirection: 'column', gap: '0.2rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span className="telemetry-dot-blink" style={{ width: '4px', height: '4px', backgroundColor: '#006CFF', borderRadius: '50%', boxShadow: '0 0 6px #006CFF' }} />
+              <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', color: '#006CFF', fontWeight: 'bold' }}>
+                SYS_STATUS // SEC_07
+              </span>
+            </div>
+            <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-display)', fontWeight: 'bold', color: '#ffffff', letterSpacing: '0.04em' }}>
+              M4 COMPETITION
+            </span>
+            <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}>
+              LOC_ID // MUNICH_DE
+            </span>
+          </div>
+
           {/* Top-right */}
           <div style={{
             position: 'absolute', top: '2.5rem', right: '2.5rem',
-            width: '35px', height: '35px',
-            borderTop: '1px solid rgba(255,255,255,0.12)',
-            borderRight: '1px solid rgba(255,255,255,0.12)'
-          }} />
+            paddingRight: '1rem', paddingTop: '1rem',
+            borderTop: '1px solid rgba(255,255,255,0.2)',
+            borderRight: '1px solid rgba(255,255,255,0.2)',
+            display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem'
+          }}>
+            <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.35)' }}>
+              CORE_REFRESH
+            </span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
+              <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-display)', color: '#ffffff', fontWeight: 'bold' }}>
+                120.0
+              </span>
+              <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', color: '#006CFF' }}>
+                HZ
+              </span>
+            </div>
+            <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em' }}>
+              DIAGNOSTIC // ACTIVE
+            </span>
+          </div>
+
           {/* Bottom-left */}
           <div style={{
             position: 'absolute', bottom: '2.5rem', left: '2.5rem',
@@ -2035,13 +2045,25 @@ export default function App() {
             borderBottom: '1px solid rgba(255,255,255,0.12)',
             borderLeft: '1px solid rgba(255,255,255,0.12)'
           }} />
+
           {/* Bottom-right */}
           <div style={{
             position: 'absolute', bottom: '2.5rem', right: '2.5rem',
-            width: '35px', height: '35px',
-            borderBottom: '1px solid rgba(255,255,255,0.12)',
-            borderRight: '1px solid rgba(255,255,255,0.12)'
-          }} />
+            paddingRight: '1rem', paddingBottom: '1rem',
+            borderBottom: '1px solid rgba(255,255,255,0.2)',
+            borderRight: '1px solid rgba(255,255,255,0.2)',
+            display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem'
+          }}>
+            <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.35)' }}>
+              BUILD_REVISION
+            </span>
+            <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-display)', color: '#ffffff', fontWeight: 'bold' }}>
+              v2.0.6
+            </span>
+            <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em' }}>
+              SESSION // OK
+            </span>
+          </div>
 
           {/* ═══ LEFT EDGE — vertical accent line + text ═══ */}
           <div style={{
@@ -2095,16 +2117,16 @@ export default function App() {
             </span>
           </div>
 
-          {/* ═══ BOTTOM CREDITS — pinned to very bottom ═══ */}
+          {/* ═══ TOP CREDITS — pinned to top ═══ */}
           <div style={{
             position: 'absolute',
-            bottom: '1.8rem',
+            top: '2.2rem',
             left: '50%',
             transform: 'translateX(-50%)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.8rem',
+            gap: '0.6rem',
             pointerEvents: 'none',
             width: '90%',
             maxWidth: '580px'
@@ -2115,53 +2137,57 @@ export default function App() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.2rem'
+              gap: '0.3rem'
             }}>
               <span style={{
-                fontSize: '0.45rem',
-                fontFamily: 'var(--font-mono)',
-                letterSpacing: '0.4em',
-                color: 'rgba(255,255,255,0.3)',
-                textShadow: '0 2px 10px rgba(0,0,0,0.9)'
+                fontSize: '0.58rem',
+                fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif',
+                letterSpacing: '0.45em',
+                color: '#ffffff',
+                fontWeight: '700',
+                textShadow: '0 2px 12px rgba(0, 0, 0, 1), 0 1px 3px rgba(0, 0, 0, 1)'
               }}>
                 DESIGNED & ENGINEERED BY
               </span>
               <span style={{
-                fontSize: '2.2rem',
-                fontFamily: 'var(--font-display)',
-                fontWeight: '900',
-                letterSpacing: '0.15em',
+                fontSize: '2.8rem',
+                fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif',
+                fontWeight: '700',
+                letterSpacing: '0.3em',
                 color: '#ffffff',
-                textShadow: '0 4px 30px rgba(0,0,0,0.8)',
-                lineHeight: 1
+                textShadow: '0 4px 24px rgba(0, 0, 0, 0.75), 0 2px 4px rgba(0, 0, 0, 0.95)',
+                lineHeight: 1.1,
+                margin: '0.3rem 0'
               }}>
                 RAKSHAK
               </span>
             </div>
 
-            {/* Separator line with blue dot */}
+            {/* Separator line with white dot */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.6rem',
               width: '100%',
-              maxWidth: '260px'
+              maxWidth: '320px',
+              margin: '0.2rem 0'
             }}>
-              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
+              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2))' }} />
               <div style={{
-                width: '5px', height: '5px', borderRadius: '50%',
-                background: 'linear-gradient(135deg, #006CFF, #00B4FF)',
-                boxShadow: '0 0 8px rgba(0, 108, 255, 0.5)'
+                width: '6px', height: '6px', borderRadius: '50%',
+                background: '#ffffff',
+                boxShadow: '0 0 10px rgba(255, 255, 255, 0.7)'
               }} />
-              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
+              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.2), transparent)' }} />
             </div>
 
             {/* Social pills */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
-              pointerEvents: 'auto'
+              gap: '0.8rem',
+              pointerEvents: 'auto',
+              marginTop: '0.4rem'
             }}>
               <a
                 href="mailto:rakshakpatel2005@gmail.com"
@@ -2169,35 +2195,35 @@ export default function App() {
                 rel="noopener noreferrer"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.background = 'rgba(0, 108, 255, 0.1)';
-                  e.currentTarget.style.borderColor = 'rgba(0, 108, 255, 0.35)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #007cff, #005ce6)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 108, 255, 0.4)';
                   handleMouseEnter();
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #006CFF, #0050CC)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 108, 255, 0.25)';
                   handleMouseLeave();
                 }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '0.5rem',
-                  background: 'rgba(255,255,255,0.04)',
-                  backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '100px', padding: '0.5rem 1rem',
-                  textDecoration: 'none', cursor: 'none',
-                  transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+                  display: 'flex', alignItems: 'center', gap: '0.6rem',
+                  background: 'linear-gradient(135deg, #006CFF, #0050CC)',
+                  border: 'none',
+                  borderRadius: '100px', padding: '0.6rem 1.4rem',
+                  textDecoration: 'none', cursor: 'pointer',
+                  transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: '0 6px 20px rgba(0, 108, 255, 0.25)'
                 }}
               >
-                <span style={{ fontSize: '0.7rem' }}>✉</span>
-                <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.65)' }}>
+                <span style={{ fontSize: '0.8rem', color: '#ffffff' }}>✉</span>
+                <span style={{ fontSize: '0.52rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', color: '#ffffff', fontWeight: 'bold' }}>
                   rakshakpatel2005@gmail.com
                 </span>
               </a>
 
               <span style={{
-                width: '3px', height: '3px',
-                backgroundColor: 'rgba(0, 108, 255, 0.4)',
+                width: '4px', height: '4px',
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
                 transform: 'rotate(45deg)'
               }} />
 
@@ -2207,44 +2233,50 @@ export default function App() {
                 rel="noopener noreferrer"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.background = 'rgba(0, 108, 255, 0.1)';
-                  e.currentTarget.style.borderColor = 'rgba(0, 108, 255, 0.35)';
+                  e.currentTarget.style.background = '#f0f0f0';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(255, 255, 255, 0.25)';
                   handleMouseEnter();
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                  e.currentTarget.style.background = '#ffffff';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 255, 255, 0.15)';
                   handleMouseLeave();
                 }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '0.5rem',
-                  background: 'rgba(255,255,255,0.04)',
-                  backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '100px', padding: '0.5rem 1rem',
-                  textDecoration: 'none', cursor: 'none',
-                  transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+                  display: 'flex', alignItems: 'center', gap: '0.6rem',
+                  background: '#ffffff',
+                  border: 'none',
+                  borderRadius: '100px', padding: '0.6rem 1.4rem',
+                  textDecoration: 'none', cursor: 'pointer',
+                  transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: '0 6px 20px rgba(255, 255, 255, 0.15)'
                 }}
               >
-                <span style={{ fontSize: '0.7rem' }}>⌘</span>
-                <span style={{ fontSize: '0.45rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.65)' }}>
+                <span style={{ fontSize: '0.8rem', color: '#000000' }}>⌘</span>
+                <span style={{ fontSize: '0.52rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', color: '#000000', fontWeight: 'bold' }}>
                   github.com/rakshak2005
                 </span>
               </a>
             </div>
-
-            {/* Copyright micro-text */}
-            <span style={{
-              fontSize: '0.35rem',
-              fontFamily: 'var(--font-mono)',
-              letterSpacing: '0.2em',
-              color: 'rgba(255,255,255,0.15)',
-              textShadow: '0 2px 6px rgba(0,0,0,0.9)'
-            }}>
-              © 2026 BMW M4 COMPETITION — CONCEPT EXPERIENCE
-            </span>
           </div>
+
+          {/* Copyright micro-text — positioned at the absolute bottom of the screen below the timeline */}
+          <span style={{
+            position: 'absolute',
+            bottom: '1.2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: '0.4rem',
+            fontFamily: 'var(--font-mono)',
+            letterSpacing: '0.22em',
+            color: 'rgba(255,255,255,0.3)',
+            textShadow: '0 2px 6px rgba(0,0,0,0.9)',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap'
+          }}>
+            © 2026 BMW M4 COMPETITION — CONCEPT EXPERIENCE
+          </span>
         </div>
       )}
 
