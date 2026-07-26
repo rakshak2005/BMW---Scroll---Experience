@@ -776,19 +776,13 @@ export default function App() {
           pointerEvents: 'none'
         }} />
 
-        {/* Brand BMW Logo Vector */}
+        {/* Brand BMW Logo PNG Asset */}
         <div style={{ zIndex: 10, marginBottom: '2.2rem', filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.18))' }}>
-          <svg viewBox="0 0 100 100" width="90" height="90">
-            <circle cx="50" cy="50" r="48" fill="#000000" stroke="#ffffff" strokeWidth="2.5" />
-            <circle cx="50" cy="50" r="32" fill="none" stroke="#ffffff" strokeWidth="1.5" />
-            <path d="M 50 50 L 50 18 A 32 32 0 0 0 18 50 Z" fill="#006CFF" />
-            <path d="M 50 50 L 82 50 A 32 32 0 0 0 50 18 Z" fill="#ffffff" />
-            <path d="M 50 50 L 50 82 A 32 32 0 0 0 82 50 Z" fill="#006CFF" />
-            <path d="M 50 50 L 18 50 A 32 32 0 0 0 50 82 Z" fill="#ffffff" />
-            <text x="31" y="42" fill="#ffffff" fontFamily="'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif" fontSize="12" fontWeight="bold" transform="rotate(-40 31 42)">B</text>
-            <text x="50" y="32" fill="#ffffff" fontFamily="'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif" fontSize="12" fontWeight="bold" textAnchor="middle">M</text>
-            <text x="69" y="42" fill="#ffffff" fontFamily="'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif" fontSize="12" fontWeight="bold" transform="rotate(40 69 42)">W</text>
-          </svg>
+          <img 
+            src="/bmw_logo_mobile.png" 
+            alt="BMW Logo" 
+            style={{ width: '90px', height: '90px', objectFit: 'contain' }} 
+          />
         </div>
 
         {/* Content Card */}
