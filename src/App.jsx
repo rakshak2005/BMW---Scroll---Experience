@@ -14,7 +14,7 @@ export default function App() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0); // 0: HERO, 1: GRILLE, 2: REAR, 3: SWEEP, 4: BRIDGE, 5: TEST DRIVE
-  
+
   // Interactive specs count-up states for next-gen HUDs
   const [power, setPower] = useState(0);
   const [torque, setTorque] = useState(0);
@@ -36,7 +36,7 @@ export default function App() {
   const headerRef = useRef(null);
   const floatCardRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
-  
+
   // Elements for Section 2 (Frame 101 grille stop)
   const sec2TitleRef = useRef(null);
   const sec2GlowRef = useRef(null);
@@ -114,7 +114,7 @@ export default function App() {
     const scaleMultiplier = isFirstFrame ? 1.05 : 1.0;
     const scale = Math.max(canvas.width / img.width, canvas.height / img.height) * scaleMultiplier;
     const x = (canvas.width / 2) - (img.width / 2) * scale;
-    
+
     // Shift the car downwards only on the first frame, bounded to prevent black bars
     const baseY = (canvas.height / 2) - (img.height / 2) * scale;
     const maxShiftY = Math.max(0, ((img.height * scale) - canvas.height) / 2);
@@ -180,7 +180,7 @@ export default function App() {
     essentialArray.forEach((index) => {
       const img = loadedImages[index];
       img.src = getSrcForIndex(index);
-      
+
       const onEssentialLoad = () => {
         essentialLoadedCount++;
         const progress = Math.round((essentialLoadedCount / totalEssential) * 100);
@@ -391,13 +391,13 @@ export default function App() {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
     const totalHeight = container.clientHeight - window.innerHeight;
-    
+
     let scrollFraction = 0;
     if (slideId === 0) scrollFraction = 0.0;
     else if (slideId === 1) scrollFraction = 0.14; // Center of Grille stop (10% - 17%)
     else if (slideId === 2) scrollFraction = 0.29; // Center of Rear stop (23% - 30%)
     else if (slideId === 3) scrollFraction = 0.50; // Sweep section stop 1 (40% - 48%)
-    
+
     const targetScrollY = scrollFraction * totalHeight;
     window.scrollTo({
       top: targetScrollY,
@@ -417,16 +417,16 @@ export default function App() {
 
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;
-      
+
       const container = scrollContainerRef.current;
       const rect = container.getBoundingClientRect();
-      
+
       const totalScrollableHeight = rect.height - window.innerHeight;
       const scrolled = -rect.top;
-      
+
       let scrollFraction = scrolled / totalScrollableHeight;
       scrollFraction = Math.max(0, Math.min(1, scrollFraction));
-      
+
       // Fill bottom center scroll discover line gradually on Section 4
       if (scrollLineProgressRef.current) {
         scrollLineProgressRef.current.style.width = `${scrollFraction * 100}%`;
@@ -450,7 +450,7 @@ export default function App() {
       } else {
         setActiveSlide(5); // TEST DRIVE stop view
       }
-      
+
       let targetFrame = 0;
       if (scrollFraction < 0.10) {
         targetFrame = (scrollFraction / 0.10) * 101;
@@ -491,7 +491,7 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
-    
+
     handleScroll();
 
     return () => {
@@ -504,16 +504,16 @@ export default function App() {
   const getNearestLoadedImage = (index) => {
     const images = imagesRef.current;
     if (!images || images.length === 0) return null;
-    
+
     // Check target frame
     if (images[index] && images[index].complete && images[index].naturalWidth) {
       return images[index];
     }
-    
+
     // Bidirectional search
     let left = index - 1;
     let right = index + 1;
-    
+
     while (left >= 0 || right < images.length) {
       if (left >= 0 && images[left] && images[left].complete && images[left].naturalWidth) {
         return images[left];
@@ -524,7 +524,7 @@ export default function App() {
       left--;
       right++;
     }
-    
+
     return null;
   };
 
@@ -537,7 +537,7 @@ export default function App() {
     const update = () => {
       const state = stateRef.current;
       const diff = state.targetFrame - state.currentFrame;
-      
+
       if (Math.abs(diff) < 0.05) {
         state.currentFrame = state.targetFrame;
       } else {
@@ -625,7 +625,7 @@ export default function App() {
         } else if (frameToDraw > 101 && frameToDraw <= 118) {
           opacity = (118 - frameToDraw) / 17;
         }
-        
+
         opacity = Math.max(0, Math.min(1, opacity));
         sec2TitleRef.current.style.opacity = opacity;
         sec2GlowRef.current.style.opacity = opacity * 0.16; // Glow opacity cap at 16%
@@ -756,10 +756,134 @@ export default function App() {
   }, [isLoaded]);
 
   return (
-    <div 
+    <div
       ref={appContainerRef}
       style={{ backgroundColor: '#05070A', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}
     >
+      {/* Mobile / Tablet Fallback Overlay */}
+      <div className="mobile-fallback-overlay">
+        {/* Soft background blue glow */}
+        <div style={{
+          position: 'absolute',
+          top: '30%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '320px',
+          height: '320px',
+          background: 'radial-gradient(circle, rgba(0, 108, 255, 0.35) 0%, transparent 70%)',
+          filter: 'blur(50px)',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }} />
+
+        {/* Brand BMW Logo Vector */}
+        <div style={{ zIndex: 10, marginBottom: '2.2rem', filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.18))' }}>
+          <svg viewBox="0 0 100 100" width="90" height="90">
+            <circle cx="50" cy="50" r="48" fill="#000000" stroke="#ffffff" strokeWidth="2.5" />
+            <circle cx="50" cy="50" r="32" fill="none" stroke="#ffffff" strokeWidth="1.5" />
+            <path d="M 50 50 L 50 18 A 32 32 0 0 0 18 50 Z" fill="#006CFF" />
+            <path d="M 50 50 L 82 50 A 32 32 0 0 0 50 18 Z" fill="#ffffff" />
+            <path d="M 50 50 L 50 82 A 32 32 0 0 0 82 50 Z" fill="#006CFF" />
+            <path d="M 50 50 L 18 50 A 32 32 0 0 0 50 82 Z" fill="#ffffff" />
+            <text x="31" y="42" fill="#ffffff" fontFamily="'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif" fontSize="12" fontWeight="bold" transform="rotate(-40 31 42)">B</text>
+            <text x="50" y="32" fill="#ffffff" fontFamily="'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif" fontSize="12" fontWeight="bold" textAnchor="middle">M</text>
+            <text x="69" y="42" fill="#ffffff" fontFamily="'Helvetica Neue', Helvetica, 'Segoe UI', Arial, sans-serif" fontSize="12" fontWeight="bold" transform="rotate(40 69 42)">W</text>
+          </svg>
+        </div>
+
+        {/* Content Card */}
+        <div
+          className="luxury-glass-panel"
+          style={{
+            zIndex: 10,
+            maxWidth: '420px',
+            width: '90%',
+            padding: '2.2rem 2rem',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.2rem',
+            boxSizing: 'border-box',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.55)',
+            borderRadius: '24px',
+            background: 'linear-gradient(135deg, rgba(10, 14, 22, 0.7) 0%, rgba(6, 8, 12, 0.5) 100%)',
+            backdropFilter: 'blur(30px)',
+            WebkitBackdropFilter: 'blur(30px)'
+          }}
+        >
+          <div style={{
+            fontSize: '0.55rem',
+            fontFamily: 'var(--font-mono)',
+            letterSpacing: '0.22rem',
+            color: '#006CFF',
+            fontWeight: 'bold',
+            textTransform: 'uppercase'
+          }}>
+            SYSTEM DIAGNOSTICS // SEC_00
+          </div>
+
+          <h2 style={{
+            fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif',
+            fontWeight: '700',
+            fontSize: '1.25rem',
+            letterSpacing: '0.05em',
+            color: '#ffffff',
+            margin: 0,
+            lineHeight: 1.3
+          }}>
+            Note from Rakshak Patel V, The Designer:
+          </h2>
+
+          <p style={{
+            fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif',
+            fontSize: '0.75rem',
+            lineHeight: 1.6,
+            color: '#B7BCC8',
+            margin: 0,
+            textAlign: 'center'
+          }}>
+            This interactive concept experience is crafted exclusively for large screen desktop displays. The performance-tuned scroll-linked cinematic animations, dynamic HUD diagnostic timelines, and real-time canvas image streaming renderers require a wider desktop viewport to be experienced.
+          </p>
+
+          <div style={{
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            paddingTop: '1.2rem',
+            marginTop: '0.4rem'
+          }}>
+            <span style={{
+              display: 'inline-block',
+              fontSize: '0.55rem',
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.15em',
+              color: '#ffffff',
+              border: '1px solid rgba(255,255,255,0.25)',
+              borderRadius: '6px',
+              padding: '0.6rem 1rem',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              fontWeight: 'bold'
+            }}>
+              PLEASE OPEN ON A DESKTOP OR LAPTOP
+            </span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <span style={{
+          position: 'absolute',
+          bottom: '2rem',
+          fontSize: '0.45rem',
+          fontFamily: 'var(--font-mono)',
+          letterSpacing: '0.2em',
+          color: 'rgba(255,255,255,0.25)',
+          textAlign: 'center',
+          width: '90%',
+          lineHeight: 1.4
+        }}>
+          © 2026 BMW M4 COMPETITION — CONCEPT SCROLL EXPERIENCE
+        </span>
+      </div>
+
       {/* Custom premium cursor */}
       <div ref={cursorDotRef} className="cursor-dot" />
       <div ref={cursorFollowerRef} className="cursor-follower" />
@@ -842,7 +966,7 @@ export default function App() {
           }}>
             Loading Experience
           </div>
-          
+
           <div style={{
             width: '280px',
             height: '2px',
@@ -852,7 +976,7 @@ export default function App() {
           }}>
             <div className="loader-sweep" />
           </div>
-          
+
           <div style={{
             fontSize: '0.55rem',
             fontFamily: 'monospace',
@@ -870,7 +994,7 @@ export default function App() {
 
       {/* HEADER NAVIGATION (Only on Hero, fades on scroll) */}
       {isLoaded && (
-        <header 
+        <header
           ref={headerRef}
           style={{
             position: 'fixed',
@@ -889,17 +1013,17 @@ export default function App() {
         >
           {/* Right-aligned Navigation and Menu grouped together for readability */}
           <div style={{ display: 'flex', gap: '3.5rem', alignItems: 'center' }}>
-            <nav style={{ 
-              display: 'flex', 
-              gap: '2.5rem', 
+            <nav style={{
+              display: 'flex',
+              gap: '2.5rem',
               alignItems: 'center'
             }}>
               {[
                 { name: 'Models', href: 'https://www.bmw.in/en/all-models.html', target: '_blank' },
                 { name: 'Configurator', href: 'https://www.bmw.in/en/digital-services/bmw-digital-key.html', target: '_blank' }
               ].map((item) => (
-                <a 
-                  key={item.name} 
+                <a
+                  key={item.name}
                   href={item.href}
                   target={item.target || undefined}
                   rel={item.target ? 'noopener noreferrer' : undefined}
@@ -928,7 +1052,7 @@ export default function App() {
             </nav>
 
             {/* Menu Trigger */}
-            <div 
+            <div
               className="animated-hamburg-trigger"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
@@ -968,8 +1092,8 @@ export default function App() {
             alignItems: 'center',
             cursor: 'pointer'
           }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             {/* The Rail Background Line */}
             <div style={{
@@ -990,10 +1114,10 @@ export default function App() {
               ].map((section) => {
                 const isActive = activeSlide === (
                   section.label === 'HERO' ? 0 :
-                  section.label === 'GRILLE' ? 1 :
-                  section.label === 'REAR' ? 2 :
-                  section.label === 'SWEEP' ? 3 :
-                  section.label === 'BRIDGE' ? 4 : 5
+                    section.label === 'GRILLE' ? 1 :
+                      section.label === 'REAR' ? 2 :
+                        section.label === 'SWEEP' ? 3 :
+                          section.label === 'BRIDGE' ? 4 : 5
                 );
                 return (
                   <div
@@ -1051,7 +1175,7 @@ export default function App() {
 
       {/* HERO SECTION OVERLAY (Only on starting screen, fades out instantly on scroll) */}
       {isLoaded && (
-        <div 
+        <div
           ref={heroSectionRef}
           style={{
             position: 'fixed',
@@ -1098,7 +1222,7 @@ export default function App() {
               MACHINE
             </h2>
           </div>
- 
+
           <p style={{
             fontSize: '0.85rem',
             color: 'rgba(255, 255, 255, 0.9)',
@@ -1112,15 +1236,15 @@ export default function App() {
           </p>
 
           <div style={{ display: 'flex', gap: '1.2rem', pointerEvents: 'auto' }}>
-            <a 
+            <a
               href="https://www.bmw.in/en/index.html"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-luxury-primary"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              style={{ 
-                padding: '0.8rem 2rem', 
+              style={{
+                padding: '0.8rem 2rem',
                 fontSize: '0.7rem',
                 textDecoration: 'none',
                 display: 'inline-block',
@@ -1129,15 +1253,15 @@ export default function App() {
             >
               Explore
             </a>
-            <a 
+            <a
               href="https://youtu.be/Qf2fnG5UmdQ"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-luxury-glass"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              style={{ 
-                padding: '0.8rem 2rem', 
+              style={{
+                padding: '0.8rem 2rem',
                 fontSize: '0.7rem',
                 textDecoration: 'none',
                 display: 'inline-block',
@@ -1152,7 +1276,7 @@ export default function App() {
 
       {/* FLOATING GLASS CARD (Only on starting screen, fades out instantly on scroll) */}
       {isLoaded && (
-        <div 
+        <div
           ref={floatCardRef}
           className="luxury-glass-panel"
           style={{
@@ -1197,8 +1321,8 @@ export default function App() {
               <div className="luxury-spec-label">EST. STARTING</div>
               <div className="luxury-spec-value" style={{ fontWeight: '400' }}>₹72,90,000</div>
             </div>
-            <a 
-              href="https://www.bmw.in/en/index.html" 
+            <a
+              href="https://www.bmw.in/en/index.html"
               target="_blank"
               rel="noopener noreferrer"
               className="luxury-spec-explore-btn"
@@ -1214,7 +1338,7 @@ export default function App() {
 
       {/* PREMIUM SCROLL INDICATOR (Only on starting screen, fades out instantly on scroll) */}
       {isLoaded && (
-        <div 
+        <div
           ref={scrollIndicatorRef}
           style={{
             position: 'fixed',
@@ -1233,7 +1357,7 @@ export default function App() {
             SCROLL TO EXPERIENCE
           </span>
           <div style={{ width: '1px', height: '40px', backgroundColor: 'rgba(255, 255, 255, 0.1)', position: 'relative', overflow: 'hidden' }}>
-            <div 
+            <div
               style={{
                 position: 'absolute',
                 top: 0,
@@ -1277,7 +1401,7 @@ export default function App() {
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--text-secondary)', letterSpacing: '0.15em', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
               M4_F82
             </span>
-            
+
             {/* Main Title */}
             <h2 style={{
               fontFamily: "var(--font-display)",
@@ -1293,18 +1417,18 @@ export default function App() {
             </h2>
 
             {/* Tech bracket right with Pulsing dot */}
-            <span style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.4rem', 
-              fontFamily: 'var(--font-mono)', 
-              fontSize: '0.55rem', 
-              color: 'var(--accent-blue)', 
-              letterSpacing: '0.15em', 
+            <span style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.55rem',
+              color: 'var(--accent-blue)',
+              letterSpacing: '0.15em',
               fontWeight: 'bold',
               textShadow: '0 1px 2px rgba(0,0,0,0.8)'
             }}>
-              <span 
+              <span
                 className="pulsing-dot-blue"
                 style={{
                   width: '5px',
@@ -1313,7 +1437,7 @@ export default function App() {
                   borderRadius: '50%',
                   display: 'inline-block',
                   boxShadow: '0 0 8px var(--accent-blue)'
-                }} 
+                }}
               />
             </span>
           </div>
@@ -1396,13 +1520,13 @@ export default function App() {
             ].map((item, idx) => {
               const isRearActive = activeSlide === 2;
               return (
-                <div 
-                  key={item.label} 
-                  style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: '0.2rem', 
-                    borderTop: '1px solid rgba(255,255,255,0.06)', 
+                <div
+                  key={item.label}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.2rem',
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
                     paddingTop: '0.6rem',
                     opacity: isRearActive ? 1 : 0,
                     transform: isRearActive ? 'translateY(0)' : 'translateY(8px)',
@@ -1426,14 +1550,14 @@ export default function App() {
           </div>
 
           {/* Footnote divider and footnotes */}
-          <div style={{ 
-            borderTop: '1px solid rgba(255,255,255,0.06)', 
+          <div style={{
+            borderTop: '1px solid rgba(255,255,255,0.06)',
             paddingTop: '0.6rem',
-            fontSize: '0.48rem', 
-            fontFamily: 'var(--font-mono)', 
-            color: 'var(--text-muted)', 
-            letterSpacing: '0.12em', 
-            lineHeight: '1.4' 
+            fontSize: '0.48rem',
+            fontFamily: 'var(--font-mono)',
+            color: 'var(--text-muted)',
+            letterSpacing: '0.12em',
+            lineHeight: '1.4'
           }}>
             REAR SPOILER ANGLE: AUTO-BALANCED<br />
             ACTIVE DIFF LOCKING RATIO: VARIABLE 0-100%
@@ -1443,7 +1567,7 @@ export default function App() {
 
       {/* SECTION 4: NEXT-GEN AUTOMOTIVE HERO EXPLORER OVERLAYS (Only reveals at Sweep stop around frame 325) */}
       {isLoaded && (
-        <div 
+        <div
           ref={sec4TitleRef}
           style={{
             position: 'fixed',
@@ -1459,7 +1583,7 @@ export default function App() {
           }}
         >
           {/* TOP LEFT: LIVE TELEMETRY BADGE */}
-          <div 
+          <div
             className="sec4-badge-left luxury-glass-panel"
             style={{
               position: 'absolute',
@@ -1520,7 +1644,7 @@ export default function App() {
           </div>
 
           {/* TOP RIGHT: NUMERICAL TELEMETRY BOARD */}
-          <div 
+          <div
             className="sec4-telemetry-right luxury-glass-panel"
             style={{
               position: 'absolute',
@@ -1561,7 +1685,7 @@ export default function App() {
           </div>
 
           {/* BOTTOM LEFT: ONBOARD DIAGNOSTICS */}
-          <div 
+          <div
             className="sec4-diagnostics-left luxury-glass-panel"
             style={{
               position: 'absolute',
@@ -1610,7 +1734,7 @@ export default function App() {
               <span>DISCOVER</span>
             </div>
             <div style={{ width: '120px', height: '2px', backgroundColor: 'rgba(255,255,255,0.1)', position: 'relative', overflow: 'hidden' }}>
-              <div 
+              <div
                 ref={scrollLineProgressRef}
                 style={{
                   position: 'absolute',
@@ -1626,7 +1750,7 @@ export default function App() {
           </div>
 
           {/* BOTTOM RIGHT: FLOATING CONFIGURE BUTTON KEYS */}
-          <div 
+          <div
             className="sec4-configure-right"
             style={{
               position: 'absolute',
@@ -1729,24 +1853,24 @@ export default function App() {
             <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: '900', fontSize: '2.4rem', letterSpacing: '0.25em', color: '#ffffff', margin: 0, textTransform: 'uppercase', lineHeight: '1.2', textShadow: '0 4px 20px rgba(0, 0, 0, 0.95), 0 2px 4px rgba(0, 0, 0, 0.95)' }}>
               ENGINEERED<br />FOR EVERY ROAD
             </h1>
-            <div style={{ 
-              fontSize: '0.85rem', 
-              fontFamily: 'var(--font-display)', 
-              letterSpacing: '0.15em', 
-              color: '#ffffff', 
-              textTransform: 'uppercase', 
-              marginTop: '0.9rem', 
-              maxWidth: '520px', 
-              lineHeight: '1.6', 
-              fontWeight: '500', 
-              textShadow: '0 2px 14px rgba(0, 0, 0, 1), 0 4px 30px rgba(0, 0, 0, 1), 0 1px 2px rgba(0, 0, 0, 1)' 
+            <div style={{
+              fontSize: '0.85rem',
+              fontFamily: 'var(--font-display)',
+              letterSpacing: '0.15em',
+              color: '#ffffff',
+              textTransform: 'uppercase',
+              marginTop: '0.9rem',
+              maxWidth: '520px',
+              lineHeight: '1.6',
+              fontWeight: '500',
+              textShadow: '0 2px 14px rgba(0, 0, 0, 1), 0 4px 30px rgba(0, 0, 0, 1), 0 1px 2px rgba(0, 0, 0, 1)'
             }}>
               Precision engineered to deliver unmatched performance in every condition.
             </div>
           </div>
 
           {/* TOP LEFT: ACTIVE CHASSIS TELEMETRY */}
-          <div 
+          <div
             className="luxury-glass-panel"
             style={{
               position: 'absolute',
@@ -1767,9 +1891,9 @@ export default function App() {
                 ACTIVE HANDLING // SEC_05
               </span>
             </div>
-            
+
             <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.06)' }} />
-            
+
             {/* Dynamic Suspension stroke indicator bars */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {[
@@ -1792,7 +1916,7 @@ export default function App() {
           </div>
 
           {/* TOP RIGHT: TELEMETRY PILLS */}
-          <div 
+          <div
             className="sec5-telemetry-right"
             style={{
               position: 'absolute',
@@ -1809,7 +1933,7 @@ export default function App() {
               { label: '0-100', val: `${bridgeZeroHundred} s` },
               { label: 'TOP SPEED', val: `${bridgeTopSpeed} km/h` }
             ].map((pill) => (
-              <div 
+              <div
                 key={pill.label}
                 className="luxury-pill-panel"
                 style={{
@@ -1861,11 +1985,11 @@ export default function App() {
             pointerEvents: 'none'
           }}>
             {/* Mono tag */}
-            <span style={{ 
-              fontSize: '0.6rem', 
-              fontFamily: 'var(--font-mono)', 
-              letterSpacing: '0.3em', 
-              color: '#006CFF', 
+            <span style={{
+              fontSize: '0.6rem',
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.3em',
+              color: '#006CFF',
               fontWeight: 'bold',
               textShadow: '0 2px 12px rgba(0, 0, 0, 0.9)'
             }}>
@@ -2150,16 +2274,16 @@ export default function App() {
                 DESIGNED & ENGINEERED BY
               </span>
               <span style={{
-                fontSize: '2.8rem',
+                fontSize: '2.4rem',
                 fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif',
                 fontWeight: '700',
-                letterSpacing: '0.3em',
+                letterSpacing: '0.25em',
                 color: '#ffffff',
                 textShadow: '0 4px 24px rgba(0, 0, 0, 0.75), 0 2px 4px rgba(0, 0, 0, 0.95)',
                 lineHeight: 1.1,
                 margin: '0.3rem 0'
               }}>
-                RAKSHAK
+                RAKSHAK PATEL V
               </span>
             </div>
 
@@ -2275,14 +2399,14 @@ export default function App() {
             pointerEvents: 'none',
             whiteSpace: 'nowrap'
           }}>
-            © 2026 BMW M4 COMPETITION — CONCEPT EXPERIENCE
+            © 2026 BMW M4 COMPETITION — CONCEPT EXPERIENCE BY RAKSHAK PATEL V
           </span>
         </div>
       )}
 
       {/* CANVAS IMAGE STREAMING VIEWPORT */}
-      <div 
-        ref={scrollContainerRef} 
+      <div
+        ref={scrollContainerRef}
         style={{ height: '1400vh', position: 'relative' }}
       >
         <div style={{
@@ -2295,14 +2419,14 @@ export default function App() {
           backgroundColor: '#05070A',
           zIndex: 1
         }}>
-          <canvas 
-            ref={canvasRef} 
-            style={{ 
-              display: 'block', 
-              width: '100%', 
+          <canvas
+            ref={canvasRef}
+            style={{
+              display: 'block',
+              width: '100%',
               height: '100%',
               objectFit: 'cover'
-            }} 
+            }}
           />
         </div>
       </div>

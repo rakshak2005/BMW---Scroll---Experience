@@ -686,3 +686,27 @@ canvas {
 .hud-pulse-glow {
   animation: pulseGlow 4s ease-in-out infinite;
 }
+
+/* Mobile / Tablet Fallback Block Screen */
+.mobile-fallback-overlay {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobile-fallback-overlay {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #05070A;
+    z-index: 1000000;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+}
