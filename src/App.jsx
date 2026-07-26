@@ -354,56 +354,16 @@ export default function App() {
     };
   }, [isLoaded, activeSlide]);
 
-  // Mouse tilt tracking & cursor movement
+  // Mouse tilt tracking & cursor movement disabled to prevent screen shake/tilt
   useEffect(() => {
     const onMouseMove = (e) => {
-      // Shake detection
-      const now = Date.now();
-      const dt = now - shakeDetectionRef.current.lastTime;
-      if (dt > 10) {
-        const dx = e.clientX - shakeDetectionRef.current.lastX;
-        const dy = e.clientY - shakeDetectionRef.current.lastY;
-        const speed = Math.sqrt(dx * dx + dy * dy) / dt;
-
-        const dirX = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
-        const dirY = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
-
-        if ((dirX !== 0 && dirX !== shakeDetectionRef.current.lastDirectionX) ||
-            (dirY !== 0 && dirY !== shakeDetectionRef.current.lastDirectionY)) {
-          if (speed > 1.5) {
-            shakeDetectionRef.current.directionChanges++;
-          }
-        }
-
-        shakeDetectionRef.current.lastX = e.clientX;
-        shakeDetectionRef.current.lastY = e.clientY;
-        shakeDetectionRef.current.lastTime = now;
-        if (dirX !== 0) shakeDetectionRef.current.lastDirectionX = dirX;
-        if (dirY !== 0) shakeDetectionRef.current.lastDirectionY = dirY;
-
-        if (shakeDetectionRef.current.directionChanges > 8) {
-          setIsShakeEffectDisabled(true);
-        }
-
-        clearTimeout(shakeDetectionRef.current.shakeResetTimeout);
-        shakeDetectionRef.current.shakeResetTimeout = setTimeout(() => {
-          shakeDetectionRef.current.directionChanges = 0;
-        }, 500);
-      }
-
-      if (isShakeEffectDisabled) {
-        mouseFactorRef.current.x = 0;
-        mouseFactorRef.current.y = 0;
-      } else {
-        // Parallax values
-        mouseFactorRef.current.x = (e.clientX / window.innerWidth) - 0.5;
-        mouseFactorRef.current.y = (e.clientY / window.innerHeight) - 0.5;
-      }
+      mouseFactorRef.current.x = 0;
+      mouseFactorRef.current.y = 0;
     };
 
     window.addEventListener('mousemove', onMouseMove);
     return () => window.removeEventListener('mousemove', onMouseMove);
-  }, [isShakeEffectDisabled]);
+  }, []);
 
   // Hover helper toggles
   const handleMouseEnter = () => {
