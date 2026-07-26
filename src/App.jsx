@@ -826,7 +826,7 @@ export default function App() {
             margin: 0,
             lineHeight: 1.3
           }}>
-            Note from Rakshak Patel V, The Designer:
+            Note from Rakshak, The Designer:
           </h2>
 
           <p style={{
@@ -2268,16 +2268,16 @@ export default function App() {
                 DESIGNED & ENGINEERED BY
               </span>
               <span style={{
-                fontSize: '2.4rem',
+                fontSize: '3rem',
                 fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif',
                 fontWeight: '700',
-                letterSpacing: '0.25em',
+                letterSpacing: '0.3em',
                 color: '#ffffff',
                 textShadow: '0 4px 24px rgba(0, 0, 0, 0.75), 0 2px 4px rgba(0, 0, 0, 0.95)',
                 lineHeight: 1.1,
                 margin: '0.3rem 0'
               }}>
-                RAKSHAK PATEL V
+                RAKSHAK
               </span>
             </div>
 
@@ -2393,7 +2393,7 @@ export default function App() {
             pointerEvents: 'none',
             whiteSpace: 'nowrap'
           }}>
-            © 2026 BMW M4 COMPETITION — CONCEPT EXPERIENCE BY RAKSHAK PATEL V
+            © 2026 BMW M4 COMPETITION — CONCEPT EXPERIENCE
           </span>
         </div>
       )}
