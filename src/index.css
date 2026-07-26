@@ -52,6 +52,7 @@ body {
 /* 4K GPU canvas properties */
 canvas {
   image-rendering: auto;
+  filter: url(#cinematic-sharpen) contrast(1.05) saturate(1.05) brightness(1.02);
   will-change: transform;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;

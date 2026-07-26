@@ -95,8 +95,8 @@ export default function App() {
     if (!canvas || !img || !img.complete) return;
 
     const ctx = canvas.getContext('2d');
-    // Use the display's native pixel ratio to prevent artificial upscaling/blurriness
-    const dpr = window.devicePixelRatio || 1;
+    // Force a high-dpi multiplier of 3 for razor-sharp 4K rendering
+    const dpr = Math.max(3, window.devicePixelRatio || 1);
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -108,10 +108,7 @@ export default function App() {
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Enable high-quality image smoothing for pristine details
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    ctx.imageSmoothingEnabled = false;
 
     const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
     const x = (canvas.width / 2) - (img.width / 2) * scale;
