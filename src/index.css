@@ -1,0 +1,476 @@
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #060708;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* HUD Styling system custom variables */
+  --accent-blue: #3B82F6;
+  --glass-bg: rgba(6, 7, 8, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --font-mono: monospace;
+  --font-display: 'Outfit', sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;700;900&family=Inter:wght@300;400;500;700&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #060708;
+  overflow-x: hidden;
+  cursor: auto; /* Hide default cursor disabled to restore normal cursor */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #060708;
+}
+::-webkit-scrollbar-thumb {
+  background: #0057FF; /* Blue scrollbar thumb */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3B82F6; /* Lighter blue on hover */
+}
+
+/* 4K GPU canvas properties */
+canvas {
+  image-rendering: auto;
+  filter: url(#cinematic-sharpen) contrast(1.05) saturate(1.05) brightness(1.02);
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: border 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Premium Buttons */
+.btn-luxury-primary {
+  padding: 0.9rem 2.2rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer; /* Changed from none to pointer */
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.btn-luxury-primary:hover {
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.15);
+}
+
+.btn-luxury-glass {
+  padding: 0.9rem 2.2rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 30px;
+  cursor: pointer; /* Changed from none to pointer */
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-luxury-glass:hover {
+  transform: scale(1.03) translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #0057FF;
+  box-shadow: 0 0 20px rgba(0, 87, 255, 0.3);
+}
+
+/* Custom Cinematic Cursor */
+.cursor-dot {
+  display: none !important;
+}
+
+.cursor-follower {
+  display: none !important;
+}
+
+.cursor-hover .cursor-follower {
+  width: 52px;
+  height: 52px;
+  border-color: #0057FF;
+  background-color: rgba(0, 87, 255, 0.05);
+}
+
+.cursor-hover .cursor-dot {
+  background-color: #ffffff;
+  width: 8px;
+  height: 8px;
+}
+
+/* Cinematic Vignette & Ambient Glow */
+.cinematic-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.75) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ambient-blue-glow {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(0, 87, 255, 0.08) 0%, transparent 70%);
+  z-index: 2;
+  pointer-events: none;
+  filter: blur(60px);
+}
+
+/* Animated Fog Movement */
+.cinematic-fog {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 50vw;
+  height: 100vh;
+  background: radial-gradient(circle at 10% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
+  filter: blur(50px);
+  z-index: 3;
+  pointer-events: none;
+  animation: slowFog 12s ease-in-out infinite alternate;
+}
+
+@keyframes slowFog {
+  0% {
+    transform: translateY(20px) scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-20px) scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+/* Floating Dust Particles */
+.dust-particle {
+  position: fixed;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Blue sweeping loader sweep */
+@keyframes blueSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.loader-sweep {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0057FF, transparent);
+  animation: blueSweep 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Headlight flare animation */
+.headlight-flare {
+  position: fixed;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(0, 87, 255, 0.15) 30%, transparent 70%);
+  filter: blur(5px);
+  border-radius: 50%;
+  z-index: 5;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.headlight-flare::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), rgba(0, 87, 255, 0.6), rgba(255, 255, 255, 0.4), transparent);
+  transform: translate(-50%, -50%) rotate(-10deg);
+}
+
+.headlight-flare.active {
+  opacity: 0.8;
+  animation: headlightPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes headlightPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0.85;
+  }
+}
+
+/* Puddle Ripple Wave Distortion */
+.puddle-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 40vh;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.puddle-ripple {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  width: 600px;
+  height: 150px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform: translate(-50%, 0) scale(0);
+  opacity: 0;
+  animation: waterRipple 8s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
+@keyframes waterRipple {
+  0% {
+    transform: translate(-50%, 0) scale(0.6);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.25;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0) scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Pulsing blue dot for telemetry active status */
+@keyframes blueDotPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 87, 255, 0.7);
+    transform: scale(0.95);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(0, 87, 255, 0);
+    transform: scale(1.1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 87, 255, 0);
+    transform: scale(0.95);
+  }
+}
+
+.pulsing-dot-blue {
+  animation: blueDotPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Blinking terminal cursor */
+@keyframes terminalBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.blinking-cursor {
+  animation: terminalBlink 1s infinite;
+}
+
+/* Hotspot pulse ripple animation */
+@keyframes hotspotRipple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.hotspot-ripple {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(59, 130, 246, 0.6);
+  animation: hotspotRipple 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+/* RESPONSIVE DESIGN SYSTEM OVERRIDES */
+:root {
+  --hud-side-margin: 4rem;
+  --header-padding-y: 2.5rem;
+}
+
+@media (max-width: 1200px) {
+  :root {
+    --hud-side-margin: 3rem;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --hud-side-margin: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --hud-side-margin: 1.2rem;
+    --header-padding-y: 1.5rem;
+  }
+
+  /* Disable custom cursor on touch/mobile devices for native responsiveness */
+  .cursor-dot,
+  .cursor-follower {
+    display: none !important;
+  }
+  
+  body {
+    cursor: auto !important;
+  }
+
+  /* Scale down typography elements for smaller screens */
+  h1 {
+    font-size: 2.8rem !important;
+    letter-spacing: -1.5px !important;
+  }
+  h2 {
+    font-size: 2.2rem !important;
+    letter-spacing: -1px !important;
+  }
+
+  /* Hide default models/config links inside header to save screen space */
+  header nav {
+    display: none !important;
+  }
+
+  /* Optimize glass cards and panels for small viewports */
+  .glass-panel {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --hud-side-margin: 0.8rem;
+  }
+
+  h1 {
+    font-size: 2rem !important;
+    letter-spacing: -1px !important;
+  }
+  h2 {
+    font-size: 1.6rem !important;
+  }
+}
+
+/* ═══ Section 7 Orbital & Glow Animations ═══ */
+
+/* Self-centered orbital ring spin (inset handles centering) */
+.sec7-orbit-ring-outer,
+.sec7-orbit-ring-mid {
+  transform-origin: center center;
+}
+
+@keyframes orbitalSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logoPulseGlow {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes indicatorSlide {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Fog drift infinite animation */
+@keyframes fogDrift {
+  0% {
+    transform: translateX(-30%) translateY(5%);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(30%) translateY(-5%);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(-30%) translateY(5%);
+    opacity: 0.3;
+  }
+}
