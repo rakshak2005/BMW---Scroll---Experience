@@ -898,57 +898,7 @@ export default function App() {
         </div>
       )}
 
-      {/* TOP-LEFT STATUS BADGE CHIP */}
-      {isLoaded && (
-        <div 
-          ref={sysStatRef}
-          className="hud-status-btn"
-          style={{
-            position: 'fixed',
-            top: 'var(--header-padding-y)',
-            left: 'var(--hud-side-margin)',
-            zIndex: 100,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.8rem',
-            cursor: 'none',
-            background: 'var(--glass-bg)',
-            border: '1px solid var(--glass-border)',
-            padding: '0.6rem 1.2rem',
-            borderRadius: '100px',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-            transition: 'all 0.3s ease',
-            pointerEvents: 'auto'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--accent-blue)';
-            e.currentTarget.style.background = 'rgba(0, 87, 255, 0.05)';
-            handleMouseEnter();
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--glass-border)';
-            e.currentTarget.style.background = 'var(--glass-bg)';
-            handleMouseLeave();
-          }}
-        >
-          <span 
-            className="pulsing-dot-blue"
-            style={{
-              width: '6px',
-              height: '6px',
-              backgroundColor: 'var(--accent-blue)',
-              borderRadius: '50%',
-              display: 'inline-block',
-              boxShadow: '0 0 10px var(--accent-blue)'
-            }} 
-          />
-          <span style={{ fontSize: '0.55rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.2em', color: 'var(--text-primary)', fontWeight: 'bold' }}>
-            SYS_STAT // ACTIVE
-          </span>
-        </div>
-      )}
+
 
       {/* HEADER NAVIGATION (Only on Hero, fades on scroll) */}
       {isLoaded && (
@@ -976,10 +926,15 @@ export default function App() {
               gap: '2.5rem', 
               alignItems: 'center'
             }}>
-              {['Models', 'Configurator'].map((item) => (
+              {[
+                { name: 'Models', href: 'https://www.bmw.in/en/all-models.html', target: '_blank' },
+                { name: 'Configurator', href: 'https://www.bmw.in/en/digital-services/bmw-digital-key.html', target: '_blank' }
+              ].map((item) => (
                 <a 
-                  key={item} 
-                  href="#" 
+                  key={item.name} 
+                  href={item.href}
+                  target={item.target || undefined}
+                  rel={item.target ? 'noopener noreferrer' : undefined}
                   style={{
                     fontSize: '0.75rem',
                     fontWeight: '600',
@@ -999,7 +954,7 @@ export default function App() {
                     handleMouseLeave();
                   }}
                 >
-                  {item}
+                  {item.name}
                 </a>
               ))}
             </nav>
@@ -1222,22 +1177,40 @@ export default function App() {
           </p>
 
           <div style={{ display: 'flex', gap: '1.2rem', pointerEvents: 'auto' }}>
-            <button 
+            <a 
+              href="https://www.bmw.in/en/index.html"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-luxury-primary"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              style={{ padding: '0.8rem 2rem', fontSize: '0.7rem' }}
+              style={{ 
+                padding: '0.8rem 2rem', 
+                fontSize: '0.7rem',
+                textDecoration: 'none',
+                display: 'inline-block',
+                textAlign: 'center'
+              }}
             >
               Explore
-            </button>
-            <button 
+            </a>
+            <a 
+              href="https://youtu.be/Qf2fnG5UmdQ"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-luxury-glass"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              style={{ padding: '0.8rem 2rem', fontSize: '0.7rem' }}
+              style={{ 
+                padding: '0.8rem 2rem', 
+                fontSize: '0.7rem',
+                textDecoration: 'none',
+                display: 'inline-block',
+                textAlign: 'center'
+              }}
             >
               Watch Film
-            </button>
+            </a>
           </div>
         </div>
       )}
