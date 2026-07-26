@@ -128,49 +128,98 @@ export default function App() {
     };
   }, [isLoaded]);
 
-  // Preload all images (including 1stimage.png at index 0)
+
+  // Preload all images progressively to prevent network choke and speed up initial page load
   useEffect(() => {
-    let loadedCount = 0;
+    // 1. Pre-create all Image objects and store in ref
     const loadedImages = [];
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image();
+      loadedImages.push(img);
+    }
+    imagesRef.current = loadedImages;
 
-    const onLoad = () => {
-      loadedCount++;
-      const progress = Math.round((loadedCount / FRAME_COUNT) * 100);
-      setLoadingProgress(progress);
-
-      if (loadedCount === FRAME_COUNT) {
-        imagesRef.current = loadedImages;
-        setIsLoaded(true);
+    // Helper to get image source path
+    const getSrcForIndex = (i) => {
+      if (i === 0) return '/1stimage.png';
+      const seqIndex = i;
+      if (seqIndex <= FOLDER3_COUNT) {
+        const frameNum = FOLDER3_START + seqIndex - 1;
+        const resolvedFrameNum = frameNum === 252 ? 251 : frameNum;
+        const frameNumStr = String(resolvedFrameNum).padStart(3, '0');
+        return `/folder3/ezgif-frame-${frameNumStr}.jpg`;
+      } else if (seqIndex <= FOLDER3_COUNT + FOLDER4_COUNT) {
+        const frameNum = String(seqIndex - FOLDER3_COUNT).padStart(3, '0');
+        return `/folder4/ezgif-frame-${frameNum}.jpg`;
+      } else {
+        const frameNum = String(seqIndex - FOLDER3_COUNT - FOLDER4_COUNT).padStart(3, '0');
+        return `/folder5/ezgif-frame-${frameNum}.jpg`;
       }
     };
 
-    for (let i = 0; i < FRAME_COUNT; i++) {
-      const img = new Image();
-      let src = '';
+    // Define essential frames to load before making site interactive (Hero + Stops + coarse frames)
+    const keyFrames = [0, 101, 186, 325, 450, 602, 712, FRAME_COUNT - 1];
+    const essentialSet = new Set(keyFrames);
+    for (let i = 0; i < FRAME_COUNT; i += 12) {
+      essentialSet.add(i);
+    }
+    const essentialArray = Array.from(essentialSet);
 
-      if (i === 0) {
-        src = '/1stimage.png';
-      } else {
-        const seqIndex = i; // seqIndex ranges from 1 to 834
-        if (seqIndex <= FOLDER3_COUNT) {
-          const frameNum = FOLDER3_START + seqIndex - 1;
-          const resolvedFrameNum = frameNum === 252 ? 251 : frameNum;
-          const frameNumStr = String(resolvedFrameNum).padStart(3, '0');
-          src = `/folder3/ezgif-frame-${frameNumStr}.jpg`;
-        } else if (seqIndex <= FOLDER3_COUNT + FOLDER4_COUNT) {
-          const frameNum = String(seqIndex - FOLDER3_COUNT).padStart(3, '0');
-          src = `/folder4/ezgif-frame-${frameNum}.jpg`;
-        } else {
-          const frameNum = String(seqIndex - FOLDER3_COUNT - FOLDER4_COUNT).padStart(3, '0');
-          src = `/folder5/ezgif-frame-${frameNum}.jpg`;
+    let essentialLoadedCount = 0;
+    const totalEssential = essentialArray.length;
+
+    // First, load the essential frames to make the site interactive quickly
+    essentialArray.forEach((index) => {
+      const img = loadedImages[index];
+      img.src = getSrcForIndex(index);
+      
+      const onEssentialLoad = () => {
+        essentialLoadedCount++;
+        const progress = Math.round((essentialLoadedCount / totalEssential) * 100);
+        setLoadingProgress(progress);
+
+        if (essentialLoadedCount === totalEssential) {
+          setIsLoaded(true);
+          // Essential loaded! Now trigger background load for all other frames
+          loadNonEssential();
+        }
+      };
+
+      img.onload = onEssentialLoad;
+      img.onerror = onEssentialLoad; // Keep loading even if a frame fails
+    });
+
+    // Load non-essential frames in the background in small batches to not choke network
+    const loadNonEssential = () => {
+      const nonEssentialArray = [];
+      for (let i = 0; i < FRAME_COUNT; i++) {
+        if (!essentialSet.has(i)) {
+          nonEssentialArray.push(i);
         }
       }
 
-      img.src = src;
-      img.onload = onLoad;
-      img.onerror = onLoad;
-      loadedImages.push(img);
-    }
+      // Load in batches of 15 frames to prevent network congestion
+      const batchSize = 15;
+      let batchIndex = 0;
+
+      const loadNextBatch = () => {
+        if (batchIndex >= nonEssentialArray.length) return;
+
+        const limit = Math.min(batchIndex + batchSize, nonEssentialArray.length);
+        for (let j = batchIndex; j < limit; j++) {
+          const index = nonEssentialArray[j];
+          const img = loadedImages[index];
+          img.src = getSrcForIndex(index);
+        }
+
+        batchIndex += batchSize;
+        // Schedule next batch slightly later
+        setTimeout(loadNextBatch, 120);
+      };
+
+      // Delay starting non-essential loads by 300ms to allow canvas initial draw to finish smoothly
+      setTimeout(loadNextBatch, 300);
+    };
   }, []);
 
   // Frame 325 count up telemetry
@@ -483,6 +532,34 @@ export default function App() {
     };
   }, [isLoaded]);
 
+  // Helper to find the nearest loaded image to prevent empty frames during background load
+  const getNearestLoadedImage = (index) => {
+    const images = imagesRef.current;
+    if (!images || images.length === 0) return null;
+    
+    // Check target frame
+    if (images[index] && images[index].complete && images[index].naturalWidth) {
+      return images[index];
+    }
+    
+    // Bidirectional search
+    let left = index - 1;
+    let right = index + 1;
+    
+    while (left >= 0 || right < images.length) {
+      if (left >= 0 && images[left] && images[left].complete && images[left].naturalWidth) {
+        return images[left];
+      }
+      if (right < images.length && images[right] && images[right].complete && images[right].naturalWidth) {
+        return images[right];
+      }
+      left--;
+      right++;
+    }
+    
+    return null;
+  };
+
   // Animation / Render loop
   useEffect(() => {
     if (!isLoaded) return;
@@ -500,7 +577,7 @@ export default function App() {
       }
 
       const frameToDraw = Math.round(state.currentFrame);
-      const img = imagesRef.current[frameToDraw];
+      const img = getNearestLoadedImage(frameToDraw);
       if (img) {
         drawSingleImage(img);
       }
